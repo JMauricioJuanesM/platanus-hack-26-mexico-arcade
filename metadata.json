@@ -1,5 +1,5 @@
 {
-  "game_name": "Platanus Hack: CDMX Brick Breaker",
-  "description": "Batalla campal por romper la mayor cantidad de ladrillos",
+  "game_name": "Deploy Wars",
+  "description": "Dos devs compiten por deployar features a producción antes que el rival. Esquiva bugs de CDMX, lanza hotfixes y haz ship a prod. ¡El que más deploya, gana!",
   "player_mode": "two_player"
 }
