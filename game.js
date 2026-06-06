@@ -4,9 +4,35 @@ const N = (c) => parseInt(c.slice(1), 16);
 const T = (s, x, y, t, sz, c, o=0.5, d=10, st={}) => s.add.text(x, y, t, {fontFamily:'monospace', fontSize:sz, color:c, ...st}).setOrigin(o).setDepth(d);
 const R = (s, x, y, w, h, c, a=1, d=2) => s.add.rectangle(x, y, w, h, c, a).setDepth(d);
 const neon = (c, sz='24px') => ({fontSize:sz, fontStyle:'bold', stroke:'#000', strokeThickness:3, shadow:{color:c, fill:true, blur:8}});
-const CDMX_BUGS = ['LUZ','SISMO','TRÁFICO','METRO','VPN','NULL','MERGE','STACK'];
-const CDMX_FEATURES = ['prod','metro','api','ui','xochi','db','tepito','sdk'];
-const CDMX_MSGS = ['CDMX 🌮','SHIP IT!','PROD!','CONDESA','ONLINE 🚀'];
+const CDMX_BUGS = ['LUZ','SISMO','TRÁFICO','METRO','VPN','NULL','MERGE','STACK','CORS','TIMEOUT','SEGFAULT','GIT BLAME','CFE','AWS DOWN','OOM KILLED','DOCKER PANIC','SPAGHETTI','TORTILLA OVERFLOW','JUNIOR BUG'];
+const CDMX_FEATURES = ['prod','metro','api','ui','xochi','db','tepito','sdk','reforma','cdmx','backend','staging','tlalpan','coyoacan','condesa','iztacalco','roma','polanco','tacos','miches','pesero','oxxo','gansito','esquites','tortas','chapultepec','metrobus'];
+const CDMX_MSGS = ['CDMX 🌮','SHIP IT!','PROD!','CONDESA','ONLINE 🚀','¡ÉCHALE!','A PROD BANDA','¡QUÉ CHINGON!','DESPLEGADO 🎉','IT WORKS 🙌','¡A WEBO! 🌮','SIN MIEDO 💪','JALA FINO 😎','PROD READY ⚡','MERGED! 🚀','NO EXPLOTÓ 🎉','¡OTRO TACO! 🌮','¡AL CIEN! 🔥','DEPLOY DE VIERNES ⚠️','TODO OK 👍'];
+const COMMIT_PFXS = ['fix','feat','chore','refactor','perf','test','build','ci','hotfix','revert','docs','style','hack','cleanup','security'];
+const mkCommit = () => `${COMMIT_PFXS[Phaser.Math.Between(0,COMMIT_PFXS.length-1)]}:\n${CDMX_FEATURES[Phaser.Math.Between(0,CDMX_FEATURES.length-1)]}`;
+const AI_WINS = [
+  '¡Te ganó la IA otra vez! 🤖 😂',
+  '¿Skynet? No, un script de 20 líneas. 🤖',
+  'La IA dominando... y tú de espectador. 😭',
+  '¿Ya probaste programar sin bugs? 💻',
+  'DEV_BOT se la sabe toda. 🤖 🔥',
+  'ChatGPT programa mejor que esto. 💀',
+  '¡Fue error de capa 8! 🧑‍💻 ❌',
+  'La IA deployó en caliente y tú... F. 💀',
+  'Reiniciando al programador... 🤖 🔄',
+  'Tu código da más miedo que el sismo. 👻',
+  'Tu commit fue rechazado por feo. 💅',
+  'DEV_BOT deployó 3 veces mientras leías esto. 🚀',
+  'Tu código no compila ni con rezos. 📿 💀',
+  '¿Seguro que pasaste la entrevista? 🧐 😂',
+  'Error 404: Habilidad no encontrada. 🔍 💀',
+  'Mucho docker, poco deploy. 🐳 😭',
+  'DEV_BOT: 1 | Humano cansado: 0. 🤖 🏆',
+  'Ni copilot te salva de esta. ✈️ 💥'
+];
+const SISMO_TITLES = ['¡SISMO! EVACUAR PROD ⚠️','¡ALERTA SÍSMICA! ¡CORRE A STAGING! 🚨','¡TEMBLOR! SE CAYÓ EL RACK 🏢','¡SISMO! ¡CORRE AL PUNTO DE REUNIÓN! 🟢','¡EL BACKEND SE TAMBALEA! 🫨'];
+const BLACKOUT_TITLES = ['¡APAGÓN EN LA CONDESA! 🔌','¡SE CAYÓ FINTUAL! 🕯️','¡CORTE DE LUZ EN PLATANUS! ⚡','¡APAGÓN EN EL BACKEND! 🔌','¡APAGÓN EN LA ROMA! 🕯️','¡CABLEBUS SIN ENERGÍA! 🚠','¡SE CAYÓ AWS US-EAST-1! ☁️','¡CORTE DE CFE! 🔌'];
+const LAG_TITLES = ['¡LAG EN EL METRO CDMX! 🐢','¡INTERNET DE CIBER CAFÉ! 🐌','¡INFINITUM LENTO! 🐢','¡DESBORDAMIENTO DE COLA! ⏳','¡LAG EN EL METROBUS! 🚍','¡TRAFICO EN PERIFERICO! 🚗','¡LAG EN PLATANUS! 🐌','¡DNS NO RESPONDE! 🐢'];
+const AI_QUIPS = ['DEV_BOT conectado','Compilando...','Stack overflow?','git stash pop','npm install...','Loading node_modules','sudo rm -rf /','No veo fallas en mi lógica','¿Y tu test unitario?','Humano detectado: fácil','deploy_final_v2.sh','¿Quién metió este bug?'];
 const L_GRID = 'ABCDEFG HIJKLMN OPQRSTU VWXYZ._ DEL,END'.split(' ').map(r => r.split(r.includes(',')?',':''));
 const K = {
   P1_U:['w'],P1_D:['s'],P1_L:['a'],P1_R:['d'],P1_1:['u'],P1_2:['i'],P1_3:['o'],P1_4:['j'],P1_5:['k'],P1_6:['l'],
@@ -35,9 +61,9 @@ function create() {
     magnetActiveUntil:{p1:0,p2:0}, firewall:{p1:0,p2:0}, lives:{p1:3,p2:3}
   };
   createControls(s); drawBackground(s); createHud(s); createPlayfield(s);
-  createTitleScreen(s); createModeScreen(s); createGameOverScreen(s);
+  createTitleScreen(s); createModeScreen(s); createGameOverScreen(s); createEndChoiceScreen(s);
   createSub(s, 'leaderScreen', 'TABLA DE LÍDERES', '');
-  createSub(s, 'ctrlScreen', 'CONTROLES', 'B1: Hotfix | B2: Revert | B3: Overclock\nB4: Laser | B5: Git Pull | B6: Firewall\n\n1. RECOGE {} | 2. DEPLOY -> Servidor\n3. EVITA BUGS | 4. RECOVERY (♥)', '11px');
+  createSub(s, 'ctrlScreen', 'CONTROLES', 'B1: Hotfix | B2: Revert | B3: Overclock\nB4: Laser | B5: Git Pull | B6: Firewall\n\n1. RECOGE {} | 2. DEPLOY -> Servidor\n3. EVITA BUGS | 4. RECOVERY (\u2665)', '11px');
   createPauseScreen(s);
   loadHighScores().then(hs => { s.st.highScores = hs; refreshTitleScores(s); }).catch(() => {});
   showTitle(s);
@@ -49,6 +75,7 @@ function update(time, delta) {
   else if (ph === 'playing') updateGame(s, time, delta);
   else if (ph === 'paused') { if (consumePressed(s, ['S1','S2'])) resumeGame(s); }
   else if (ph === 'gameover') handleNameEntry(s, time);
+  else if (ph === 'endChoice') handleEndChoice(s, time);
   else if (consumePressed(s, ['S1','S2','P1_1','P2_1'])) {
     if (ph === 'saved') returnToTitle(s);
     else if (ph === 'leaderboard' || ph === 'controls') { (ph==='leaderboard'?s.leaderScreen:s.ctrlScreen).setVisible(0); showTitle(s); }
@@ -80,6 +107,17 @@ function drawBackground(s) {
   g.strokePath().lineStyle(1, N(C.acc), 0.25);
   for (let x=40; x<800; x+=80) for (let y=40; y<600; y+=80) { g.moveTo(x-4,y); g.lineTo(x+4,y); g.moveTo(x,y-4); g.lineTo(x,y+4); }
   g.strokePath();
+  const bgItems = [
+    { t: '{ }', x: 120, y: 150, r: -15, s: 1.2 },
+    { t: 'git', x: 680, y: 480, r: 25, s: 1.0 },
+    { t: 'PROD', x: 650, y: 140, r: 10, s: 0.8 },
+    { t: 'deploy', x: 180, y: 450, r: -20, s: 1.1 }
+  ];
+  bgItems.forEach(item => {
+    const txt = T(s, item.x, item.y, item.t, '130px', C.acc, 0.5, 0, { fontStyle: 'bold', shadow: { color: C.acc, fill: true, blur: 20 } });
+    txt.setAlpha(0.035).setRotation(Phaser.Math.DegToRad(item.r)).setScale(item.s);
+    s.tweens.add({ targets: txt, y: item.y + 15, rotation: txt.rotation + 0.05, duration: 6000 + Math.random() * 2000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+  });
   const sg = s.add.graphics().setDepth(50).setAlpha(0.04).fillStyle(0,1);
   for (let y=0; y<600; y+=3) sg.fillRect(0,y,800,1);
 }
@@ -100,9 +138,11 @@ function createHud(s) {
   s.hud.divider = s.add.graphics().setDepth(10).setVisible(0);
 }
 function showHud(s, show) {
-  const v = show, m = s.st.mode, is2P = m === 'two_player';
-  ['p1Score','p2Score','timer','p1Combo','p2Combo','p1Hotfix','p2Hotfix','p1Revert','p2Revert','p1label','p2label'].forEach(k => s.hud[k].setVisible(v));
-  if (!is2P) ['p2Score','p2Combo','p2Hotfix','p2Revert','p2label'].forEach(k => s.hud[k].setVisible(0));
+  const v = show, is2P = s.st.mode === 'two_player';
+  ['p1Score','p2Score','timer','p1Combo','p1Hotfix','p1Revert','p1label'].forEach(k => s.hud[k].setVisible(v));
+  s.hud.p2Score.setVisible(v);
+  if (!is2P) ['p2Combo','p2Hotfix','p2Revert','p2label'].forEach(k => s.hud[k].setVisible(0));
+  else ['p2Combo','p2Hotfix','p2Revert','p2label'].forEach(k => s.hud[k].setVisible(v));
   s.hud.divider.setVisible(v && is2P);
 }
 function refreshHud(s) {
@@ -167,9 +207,9 @@ function spawnPackage(s, lane) {
   const is1P = s.st.mode==='one_player', ly = is1P?300:(lane===1?150:450);
   const x = Phaser.Math.Between(150, 620), y = Phaser.Math.Between(ly-(is1P?200:110), ly+(is1P?260:110));
   const c = s.add.container(x, y).setDepth(9); const aura = s.add.circle(0,0,26, N(C.pkg), 0.16); c.add(aura);
-  const box = R(s,0,0,36,36,0x0a1018).setStrokeStyle(2, N(C.pkg), 1); c.add(box);
-  const sym = T(s,0,0,'{}', '15px', '#ffd0', 0.5, 0, {fontStyle:'bold'}); c.add(sym);
-  const lbl = T(s,0,-28, CDMX_FEATURES[Phaser.Math.Between(0,7)], '9px', C.acc, 0.5, 0, {fontStyle:'bold', stroke:'#000', strokeThickness:2.5}); c.add(lbl);
+  const box = R(s,0,0,54,38,0x0a1018).setStrokeStyle(2, N(C.pkg), 1); c.add(box);
+  const sym = T(s,0,0, mkCommit(), '8.5px', C.pkg, 0.5, 0, {fontStyle:'bold', align:'center'}); c.add(sym);
+  const lbl = T(s,0,-29, '{}', '11px', C.acc, 0.5, 0, {fontStyle:'bold', stroke:'#000', strokeThickness:2}); c.add(lbl);
   s.tweens.add({ targets: aura, scale: 1.45, alpha: 0.02, duration: 750, yoyo: 1, repeat: -1 });
   s.tweens.add({ targets: [box, sym], y: -5, duration: 900, yoyo: 1, repeat: -1 });
   const obj = { container:c, lane, x, y, carried:0 }; s.pf.packages.push(obj); return obj;
@@ -206,10 +246,10 @@ function checkDeployCollision(s, t) {
       const sc = ship.carrying.length; ship.carrying.forEach(p => destroyPkg(s, p)); ship.carrying = [];
       const pts = sc===3?6:sc===2?3:1; s.st.scores[pid] += pts; s.st.combo[pid] += sc;
       if (pid==='p1' && is1P) {
-        const ol = s.st.level; s.st.level = Math.floor(s.st.scores.p1/5)+1;
+        const ol = s.st.level; s.st.level = Math.floor(s.st.scores.p1/10)+1;
         if (s.st.level>ol) { showDeployMsg(s, ship.x, ship.y-20, `⚡ LVL ${s.st.level}!`, pid); spawnParticles(s, ship.x, ship.y, 0xffff00, 25); }
       }
-      showDeployMsg(s, ship.x, ship.y, `${CDMX_MSGS[Phaser.Math.Between(0,4)]} (+${pts}!)`, pid);
+      showDeployMsg(s, ship.x, ship.y, `${CDMX_MSGS[Phaser.Math.Between(0,CDMX_MSGS.length-1)]} (+${pts}!)`, pid);
       pulseSrv(s, pid==='p1'?s.pf.srv1:s.pf.srv2, N(pid==='p1'?C.p1:C.p2));
       playSound(s, 'deploy'); spawnParticles(s, ship.x, ship.y, N(pid==='p1'?C.p1:C.p2), 20+sc*5);
     }
@@ -222,11 +262,12 @@ function updateCDMXEvents(s, t) {
   if (t >= s.st.eventTimer && !s.st.event) {
     const evs = ['sismo','blackout','lag'], type = evs[Phaser.Math.Between(0,2)], dur = type==='blackout'?5500:7000;
     s.st.event = { type, until: t+dur, nextRubble:0 }; s.st.eventTimer = t+dur+15000;
-    const titles = { sismo:'¡SISMO! EVACUAR PROD ⚠️', blackout:'¡APAGÓN EN LA CONDESA! 🔌', lag:'¡LAG EN EL METRO CDMX! 🐢' };
+    const sismT = SISMO_TITLES[Phaser.Math.Between(0,SISMO_TITLES.length-1)], blkT = BLACKOUT_TITLES[Phaser.Math.Between(0,BLACKOUT_TITLES.length-1)], lagT = LAG_TITLES[Phaser.Math.Between(0,LAG_TITLES.length-1)];
+    const titles = { sismo:sismT, blackout:blkT, lag:lagT };
     const cols = { sismo:C.p2, blackout:C.amb, lag:C.acc };
     s.hud.eventBanner.setText(titles[type]).setColor(cols[type]).setVisible(1);
     s.tweens.add({ targets: s.hud.eventBanner, scale: 1.15, alpha: {from:0.1, to:1}, duration: 350, yoyo: 1, repeat: 3, onComplete:()=>s.hud.eventBanner.setVisible(0) });
-    playSound(s, type==='sismo'?'hit':type==='blackout'?'revert':'click');
+    playSound(s, type);
   }
   if (s.st.event) {
     if (t >= s.st.event.until) { s.st.event = null; s.overlayGraphics.clear(); s.cameras.main.setScroll(0,0); return; }
@@ -297,15 +338,44 @@ function spawnHeart(s) {
   s.pf.hearts.push({ container:c, x, y });
 }
 function updateAI(s, dt, t, spd) {
-  const ship = s.pf.p2; if (s.st.lives.p2 <= 0) { if(ship.visible){ ship.setVisible(0); spawnParticles(s, ship.x, ship.y, N(C.p2), 20); } return; }
+  const ship = s.pf.p2;
+  if (s.st.lives.p2 <= 0) {
+    if (!s.st.aiRespawnAt) {
+      if(ship.visible){ ship.setVisible(0); spawnParticles(s, ship.x, ship.y, N(C.p2), 20); playSound(s,'hit'); }
+      s.st.aiRespawnAt = t + 3000;
+    } else if (t >= s.st.aiRespawnAt) {
+      s.st.lives.p2 = 2; s.st.aiRespawnAt = 0;
+      ship.carrying.forEach(p => destroyPkg(s, p)); ship.carrying = [];
+      ship.setPosition(120, 450); ship.setVisible(1);
+      showDeployMsg(s, 120, 450, AI_QUIPS[Phaser.Math.Between(0,AI_QUIPS.length-1)], 'p2');
+    }
+    return;
+  }
+  s.st.aiRespawnAt = 0;
+  // Margen de error aleatorio (~35% de falla)
+  const err = Math.random() < 0.35;
   let tx = ship.x, ty = ship.y, nb = null, mbd = 9999;
   s.pf.bugs.forEach(b => { const d = Math.sqrt((b.x-ship.x)**2+(b.y-ship.y)**2); if(d<mbd && b.x<ship.x+100){ mbd=d; nb=b; } });
-  let dg = 0; if (nb && mbd < 90) { dg=1; tx=ship.x-40; ty=ship.y+(nb.y>ship.y?-90:90); if(mbd<45){ if(t>=s.st.hotfix.p2){ doHotfix(s,'p2',ship,t); s.st.hotfix.p2=t+2500;} else if(t>=s.st.revert.p2){ doRevert(s,'p2',ship,t); s.st.revert.p2=t+3000;}} }
-  let np = null, mpd = 9999; s.pf.packages.forEach(p => { if(!p.carried){ const d = Math.sqrt((p.x-ship.x)**2+(p.y-ship.y)**2); if(d<mpd){ mpd=d; np=p; }} });
-  if(!dg){ if(ship.carrying.length>=3){ tx=710; ty=450; } else if(np){ tx=np.x; ty=np.y; } else { tx=400; ty=450; } }
-  if (t >= (s.st.overclock.p2||0) && t >= (s.st.overclockActive.p2||0) && (ship.carrying.length >= 3 || mpd > 180)) { doSkill(s,'overclock','p2',ship,t); s.st.overclock.p2 = t+4500; }
-  if (t >= (s.st.beam.p2||0) && s.pf.bugs.some(b => b.x > ship.x && b.x < ship.x+250 && Math.abs(b.y-ship.y)<22)) { doSkill(s,'beam','p2',ship,t); s.st.beam.p2 = t+4000; }
-  if (t >= (s.st.gitPull.p2||0) && ship.carrying.length < 3 && s.pf.packages.filter(p=>!p.carried).length >= 2) { doSkill(s,'gitPull','p2',ship,t); s.st.gitPull.p2 = t+5000; }
+  let dg = 0;
+  if (!err && nb && mbd < 90) {
+    dg=1; tx=ship.x-40; ty=ship.y+(nb.y>ship.y?-90:90);
+    if(mbd<45){ if(t>=s.st.hotfix.p2){ doHotfix(s,'p2',ship,t); s.st.hotfix.p2=t+2500;} else if(t>=s.st.revert.p2){ doRevert(s,'p2',ship,t); s.st.revert.p2=t+3000;} }
+  }
+  let np = null, mpd = 9999;
+  s.pf.packages.forEach(p => { if(!p.carried){ const d = Math.sqrt((p.x-ship.x)**2+(p.y-ship.y)**2); if(d<mpd){ mpd=d; np=p; }} });
+  if (!err) {
+    if(!dg){ if(ship.carrying.length>=3){ tx=710; ty=450; } else if(np){ tx=np.x; ty=np.y; } else { tx=400; ty=450; } }
+    if (t>=(s.st.overclock.p2||0) && t>=(s.st.overclockActive.p2||0) && (ship.carrying.length>=3||mpd>180)) { doSkill(s,'overclock','p2',ship,t); s.st.overclock.p2=t+4500; }
+    if (t>=(s.st.beam.p2||0) && s.pf.bugs.some(b=>b.x>ship.x&&b.x<ship.x+250&&Math.abs(b.y-ship.y)<22)) { doSkill(s,'beam','p2',ship,t); s.st.beam.p2=t+4000; }
+    if (t>=(s.st.gitPull.p2||0) && ship.carrying.length<3 && s.pf.packages.filter(p=>!p.carried).length>=2) { doSkill(s,'gitPull','p2',ship,t); s.st.gitPull.p2=t+5000; }
+  } else {
+    // Movimiento errático aleatorio y disparatado
+    tx = ship.x + Phaser.Math.Between(-300, 300);
+    ty = ship.y + Phaser.Math.Between(-200, 200);
+    // Malgasta habilidades sin sentido
+    if (Math.random() < 0.1 && t >= s.st.hotfix.p2) { doHotfix(s,'p2',ship,t); s.st.hotfix.p2=t+2500; }
+    else if (Math.random() < 0.1 && t >= s.st.revert.p2) { doRevert(s,'p2',ship,t); s.st.revert.p2=t+3000; }
+  }
   const v = { x:tx-ship.x, y:ty-ship.y }, len = Math.sqrt(v.x**2+v.y**2);
   if(len>5){ const asp = spd*(t<s.st.overclockActive.p2?1.5:1); ship.x = Phaser.Math.Clamp(ship.x+v.x/len*asp*dt, 25, 705); ship.y = Phaser.Math.Clamp(ship.y+v.y/len*asp*dt, 95, 575); ship.setPosition(ship.x, ship.y); }
   if(ship.carrying.length<3) for(const p of s.pf.packages) if(!p.carried && Math.sqrt((ship.x-p.x)**2+(ship.y-p.y)**2)<32){ p.carried=1; ship.carrying.push(p); playSound(s,'pickup'); break; }
@@ -335,18 +405,21 @@ function updateGame(s, t, delta) {
 function updatePlayer(s, pid, dt, t, spd) {
   const ship = pid==='p1'?s.pf.p1:s.pf.p2, is1P = s.st.mode==='one_player';
   const keys = pid==='p1'?['P1_L','P1_R','P1_U','P1_D','P1_1','P1_2','P1_3','P1_4','P1_5','P1_6']:['P2_L','P2_R','P2_U','P2_D','P2_1','P2_2','P2_3','P2_4','P2_5','P2_6'];
-  let vx = (held(s,keys[0])?-1:0)+(held(s,keys[1])?1:0), vy = (held(s,keys[2])?-1:0)+(held(s,keys[3])?1:0);
+  const keys2 = (pid==='p1' && is1P)?['P2_L','P2_R','P2_U','P2_D','P2_1','P2_2','P2_3','P2_4','P2_5','P2_6']:null;
+  const hk = (i) => held(s,keys[i])||(keys2 && held(s,keys2[i]));
+  const ck = (i) => consumePressed(s,[keys[i]])||(keys2 && consumePressed(s,[keys2[i]]));
+  let vx = (hk(0)?-1:0)+(hk(1)?1:0), vy = (hk(2)?-1:0)+(hk(3)?1:0);
   if(vx && vy){ vx*=0.707; vy*=0.707; }
   const minY = pid==='p1'?95:315, maxY = pid==='p1'?(is1P?575:280):575;
   const oc = t < s.st.overclockActive[pid], asp = spd*(oc?1.55:1);
   ship.x = Phaser.Math.Clamp(ship.x+vx*asp*dt, 25, 705); ship.y = Phaser.Math.Clamp(ship.y+vy*asp*dt, minY, maxY);
   ship.setPosition(ship.x, ship.y); if(ship.shield.visible) ship.shield.setPosition(ship.x, ship.y);
-  if(consumePressed(s, [keys[4]]) && t>=s.st.hotfix[pid]){ doHotfix(s, pid, ship, t); s.st.hotfix[pid]=t+2000; }
-  if(consumePressed(s, [keys[5]]) && t>=s.st.revert[pid]){ doRevert(s, pid, ship, t); s.st.revert[pid]=t+3000; }
-  if(consumePressed(s, [keys[6]]) && t>=s.st.overclock[pid]) doSkill(s,'overclock',pid,ship,t);
-  if(consumePressed(s, [keys[7]]) && t>=s.st.beam[pid]) doSkill(s,'beam',pid,ship,t);
-  if(consumePressed(s, [keys[8]]) && t>=s.st.gitPull[pid]) doSkill(s,'gitPull',pid,ship,t);
-  if(consumePressed(s, [keys[9]]) && t>=s.st.firewall[pid]) doSkill(s,'firewall',pid,ship,t);
+  if(consumePressed(s, [keys[4]])||(keys2&&consumePressed(s,[keys2[4]]))) { if(t>=s.st.hotfix[pid]){ doHotfix(s, pid, ship, t); s.st.hotfix[pid]=t+2000; } }
+  if(consumePressed(s, [keys[5]])||(keys2&&consumePressed(s,[keys2[5]]))) { if(t>=s.st.revert[pid]){ doRevert(s, pid, ship, t); s.st.revert[pid]=t+3000; } }
+  if(ck(6) && t>=s.st.overclock[pid]) doSkill(s,'overclock',pid,ship,t);
+  if(ck(7) && t>=s.st.beam[pid]) doSkill(s,'beam',pid,ship,t);
+  if(ck(8) && t>=s.st.gitPull[pid]) doSkill(s,'gitPull',pid,ship,t);
+  if(ck(9) && t>=s.st.firewall[pid]) doSkill(s,'firewall',pid,ship,t);
   if(ship.carrying.length<3) for(const p of s.pf.packages) if(!p.carried && (is1P || p.lane===(pid==='p1'?1:2)) && Math.sqrt((ship.x-p.x)**2+(ship.y-p.y)**2)<32){
     p.carried=1; ship.carrying.push(p); playSound(s,'pickup'); const tag = T(s, p.x, p.y-15, `PR #${ship.carrying.length} ADDED`, '9px', C.pkg, 0.5, 20, {fontStyle:'bold'});
     s.tweens.add({ targets: tag, y: p.y-45, alpha: 0, duration: 800, onComplete:()=>tag.destroy() }); break;
@@ -426,7 +499,7 @@ function createTitleScreen(s) {
   });
   s.tweens.add({ targets: s.glow, alpha: 0.08, duration: 1400, yoyo: 1, repeat: -1 }); s.tweens.add({ targets: s.titleTxt, scale: 1.02, duration: 1500, yoyo: 1, repeat: -1 }); c.setVisible(0);
 }
-function showTitle(s) { s.st.phase = 'start'; s.st.menu = { cursor: 0, cooldown: 0, lastAxis: 0 }; refreshTitleScores(s); updateTitleButtons(s); s.titleScreen.setVisible(1); }
+function showTitle(s) { s.st.phase = 'start'; s.st.menu = { cursor: 0, cooldown: 0, lastAxis: 0 }; refreshTitleScores(s); updateTitleButtons(s); s.titleScreen.setVisible(1); startAmbientMusic(s); }
 function updateTitleButtons(s) { s.titleBtns.forEach(({ bg, txt }, i) => { const a = i === s.st.menu.cursor; bg.setFillStyle(a?N(C.p1):N(C.dGy), a?1:0.95).setStrokeStyle(2, a?N(C.w):N(C.gy), 1); txt.setColor(a?C.bg:C.w); }); }
 function refreshTitleScores(s) { const hs = s.st.highScores; s.titleScores.setText(hs.length ? hs.slice(0,3).map((e,i) => `${i+1}. ${e.name} ${e.score} [${e.mode||'2P'}]`).join('\n') : 'sin puntuaciones'); }
 function handleTitleMenu(s, t) {
@@ -459,8 +532,67 @@ function startMatch(s) {
 }
 const pauseGame = (s) => { s.st.phase = 'paused'; s.pauseScreen.setVisible(1); };
 const resumeGame = (s) => { s.pauseScreen.setVisible(0); s.st.phase = 'playing'; };
-function finishGame(s) { s.st.phase = 'gameover'; s.overlayGraphics.clear(); s.cameras.main.setScroll(0,0); clearPlayfieldObjects(s); showPlayfield(s, 0); showHud(s, 0); showGameOver(s); }
-const returnToTitle = (s) => { s.gameOverScreen.setVisible(0); s.st.nameEntry.letters = []; showTitle(s); };
+function finishGame(s) {
+  s.st.phase = 'transition';
+  s.cameras.main.shake(350, 0.02);
+  s.cameras.main.flash(300, 255, 0, 0);
+  playSound(s, 'gameover');
+  if (s.st.scores.p2 > s.st.scores.p1) {
+    s.time.delayedCall(420, () => playSound(s, 'laugh'));
+  }
+  s.time.delayedCall(350, () => {
+    s.overlayGraphics.clear();
+    s.cameras.main.setScroll(0,0);
+    clearPlayfieldObjects(s);
+    showPlayfield(s, 0);
+    showHud(s, 0);
+    s.st.phase = 'endChoice';
+    showEndChoice(s);
+  });
+}
+const returnToTitle = (s) => { s.gameOverScreen.setVisible(0); if(s.endChoiceScreen) s.endChoiceScreen.setVisible(0); s.st.nameEntry.letters = []; showTitle(s); };
+function createEndChoiceScreen(s) {
+  const c = s.add.container(0, 0).setDepth(36); s.endChoiceScreen = c;
+  c.add(R(s, 400, 300, 800, 600, N(C.bg), 0.97));
+  s.ecTitle = T(s, 400, 180, 'GAME OVER', '42px', C.amb, 0.5, 10, {fontStyle:'bold', shadow:{color:C.amb, fill:1, blur:10}});
+  s.ecResult = T(s, 400, 240, '', '18px', C.w, 0.5, 10, {align:'center'});
+  c.add([s.ecTitle, s.ecResult]);
+  const btns = [{l:'▶ REINTENTAR', col:C.p1}, {l:'✖ TERMINAR', col:C.p2}];
+  s.ecBtns = btns.map(({l, col}, i) => {
+    const y = 320+i*64, bg = R(s, 400, y, 300, 46, N(C.dGy), 0.95).setStrokeStyle(2, N(col), 0.8), txt = T(s, 400, y, l, '22px', col, 0.5, 10, {fontStyle:'bold'});
+    c.add([bg, txt]); return { bg, txt, col };
+  });
+  c.add(T(s, 400, 490, 'MOVER ↕   CONFIRMAR B1/S1', '10px', '#fff4'));
+  c.setVisible(0);
+}
+function showEndChoice(s) {
+  s.st.endCursor = 0; s.st.endCooldown = 0;
+  const p1 = s.st.scores.p1, p2 = s.st.scores.p2, is2P = s.st.mode==='two_player';
+  const best = s.st.sessionBest || 0;
+  if (is2P) {
+    s.st.winner = p1===p2?'draw':p1>p2?'p1':'p2';
+    const msg = s.st.winner==='p2' ? AI_WINS[Phaser.Math.Between(0, AI_WINS.length-1)] : (s.st.winner==='draw'?'¡EMPATE!':'P1 GANA');
+    s.ecResult.setText(`${msg}\nP1: ${p1} deploys   P2: ${p2} deploys\nMejor sesión: ${best} pts`);
+  } else {
+    s.st.winner = 'p1';
+    const isBotBetter = p2 > p1;
+    const msg = isBotBetter ? AI_WINS[Phaser.Math.Between(0, AI_WINS.length-1)] : '¡Buen intento, humano! 👍';
+    s.ecResult.setText(`${msg}\nTus Deploys: ${p1} vs DEV_BOT: ${p2}\nMejor sesión: ${best} pts`);
+  }
+  updateEcBtns(s); s.endChoiceScreen.setVisible(1);
+}
+function updateEcBtns(s) {
+  s.ecBtns.forEach(({bg, txt, col}, i) => { const a = i===s.st.endCursor; bg.setFillStyle(a?N(col):N(C.dGy), a?1:0.95).setStrokeStyle(2, N(col), a?1:0.5); txt.setColor(a?C.bg:col).setAlpha(1); });
+}
+function handleEndChoice(s, t) {
+  const av = axisV(s);
+  if (t >= s.st.endCooldown && av !== 0) { s.st.endCursor = Phaser.Math.Wrap(s.st.endCursor+av, 0, 2); s.st.endCooldown = t+160; updateEcBtns(s); playSound(s,'click'); }
+  if (consumePressed(s, ['P1_1','P2_1','S1','S2','P1_2','P2_2'])) {
+    playSound(s,'select'); s.endChoiceScreen.setVisible(0);
+    if (s.st.endCursor === 0) { startMatch(s); }
+    else { s.st.phase = 'gameover'; showGameOver(s); }
+  }
+}
 function createGameOverScreen(s) {
   const c = s.add.container(0, 0).setDepth(35); s.gameOverScreen = c;
   c.add([R(s, 400, 300, 800, 600, N(C.bg), 0.98), s.goTitle = T(s, 400, 50, 'GAME OVER', '42px', C.amb, 0.5, 10, {fontStyle:'bold', shadow:{color:C.amb, fill:1, blur:10}}), s.goResult = T(s, 400, 102, '', '20px', C.w, 0.5, 10, {align:'center'}), T(s, 400, 150, 'TUS INICIALES:', '12px', C.acc+'88'), s.goNameVal = T(s, 400, 182, '_ _ _', '42px', C.p1, 0.5, 10, {fontStyle:'bold', letterSpacing:12}), s.goScoreList = T(s, 400, 442, '', '12px', C.w+'bb', 0.5).setOrigin(0.5, 0), s.goReplayBg = R(s, 400, 222, 330, 26, 0x151622).setStrokeStyle(2, N(C.amb), 0.9), s.goReplayTxt = T(s, 400, 222, '⚡ REPLAY: PRESIONA B3 (O/Y) ⚡', '11px', '#ffdd00', 0.5, 10, {fontStyle:'bold'}), s.goSaveStatus = T(s, 400, 582, '', '11px', C.p1, 0.5).setOrigin(0.5, 1)]);
@@ -469,6 +601,8 @@ function createGameOverScreen(s) {
 }
 function showGameOver(s) {
   const p1 = s.st.scores.p1, p2 = s.st.scores.p2, is2P = s.st.mode === 'two_player';
+  const sc = is2P ? (s.st.winner==='p1'?p1:p2) : p1;
+  if (sc > (s.st.sessionBest||0)) s.st.sessionBest = sc;
   if (is2P) { s.st.winner = p1===p2 ? 'draw' : p1>p2 ? 'p1':'p2'; s.goResult.setText(`${s.st.winner==='draw'?'¡EMPATE!':(s.st.winner==='p1'?'P1 GANA':'P2 GANA')}\nP1: ${p1}  P2: ${p2}`); }
   else { s.st.winner = 'p1'; s.goResult.setText(`${p1} DEPLOYS | LVL ${s.st.level}`); }
   s.st.nameEntry = { letters: [], row: 0, col: 0, moveCooldown: 0, confirmCooldown: 0, lastVec: { x: 0, y: 0 } };
@@ -508,30 +642,108 @@ function createPauseScreen(s) { const c = s.add.container(0, 0).setDepth(40); s.
 function startAmbientMusic(s) {
   if (s.st.musicStarted) return; s.st.musicStarted = 1;
   try {
-    const ctx = s.sound.context, out = ctx.createGain(); out.gain.value = 0.12; out.connect(ctx.destination);
+    const ctx = s.sound.context, out = ctx.createGain(); out.gain.value = 0.65; out.connect(ctx.destination);
     const dly = ctx.createDelay(1.5), dfb = ctx.createGain(); dly.delayTime.value = 0.36; dfb.gain.value = 0.22; dly.connect(dfb); dfb.connect(dly); dfb.connect(out);
     const filt = ctx.createBiquadFilter(); filt.type = 'lowpass'; filt.frequency.value = 850; filt.connect(out); filt.connect(dly);
+    const chords = [
+      [130.8, 164.8, 196.0, 246.9],
+      [155.6, 196.0, 233.1, 293.7],
+      [174.6, 220.0, 261.6, 329.6],
+      [116.5, 146.8, 174.6, 220.0]
+    ];
     [[130.8,0,'sawtooth'],[155.5,6,'sawtooth'],[196,0,'triangle']].forEach(([f,d,t]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = t; o.frequency.value = f; o.detune.value = d; g.gain.value = 0.02; o.connect(g); g.connect(filt); o.start(); });
-    const schedArp = (t) => { [261,311,392,466].forEach((f, i) => { const o = ctx.createOscillator(), g = ctx.createGain(), tt=t+i*0.34; o.type='square'; o.frequency.value=f; o.connect(g); g.connect(out); g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.03, tt+0.01); g.gain.exponentialRampToValueAtTime(0.001, tt+0.2); o.start(tt); o.stop(tt+0.2); }); s.time.delayedCall(1360, ()=>schedArp(t+1.36)); };
-    const schedBass = (t) => { const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=65.4; o.connect(g); g.connect(out); g.gain.setValueAtTime(0.2, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.3); o.start(t); o.stop(t+0.3); s.time.delayedCall(480, ()=>schedBass(t+0.48)); };
-    const t0 = ctx.currentTime+0.1; schedArp(t0); schedBass(t0);
+    const schedMusic = (step = 0) => {
+      if (s.st.phase === 'paused') { s.time.delayedCall(100, () => schedMusic(step)); return; }
+      const now = ctx.currentTime;
+      const inMenu = s.st.phase === 'start' || s.st.phase === 'modesel' || s.st.phase === 'gameover' || s.st.phase === 'endChoice' || s.st.phase === 'transition';
+      const chord = chords[Math.floor(step/16)%4];
+      const f = chord[step%4];
+      const oA = ctx.createOscillator(), gA = ctx.createGain();
+      oA.type = 'triangle'; oA.frequency.setValueAtTime(f * 2, now);
+      gA.gain.setValueAtTime(inMenu ? 0.045 : 0.09, now); gA.gain.exponentialRampToValueAtTime(0.001, now+0.15);
+      oA.connect(gA); gA.connect(out); oA.start(); oA.stop(now+0.15);
+      if (step % 2 === 0 || step % 4 === 3) {
+        const oB = ctx.createOscillator(), gB = ctx.createGain();
+        oB.type = 'sawtooth'; const fB = [65.4, 77.8, 87.3, 58.2][Math.floor(step/8)%4] * (step % 4 === 3 ? 1.5 : 1);
+        oB.frequency.setValueAtTime(fB, now);
+        gB.gain.setValueAtTime(inMenu ? 0.06 : 0.12, now); gB.gain.exponentialRampToValueAtTime(0.001, now+0.20);
+        oB.connect(gB); gB.connect(filt); oB.start(); oB.stop(now+0.20);
+      }
+      if (!inMenu) {
+        if (step % 2 === 0) {
+          const isKick = (step/2) % 2 === 0;
+          const oD = ctx.createOscillator(), gD = ctx.createGain();
+          if (isKick) {
+            oD.frequency.setValueAtTime(130, now); oD.frequency.exponentialRampToValueAtTime(45, now+0.12);
+            gD.gain.setValueAtTime(0.48, now); gD.gain.linearRampToValueAtTime(0.001, now+0.12);
+          } else {
+            oD.type = 'triangle'; oD.frequency.setValueAtTime(9000, now);
+            gD.gain.setValueAtTime(0.12, now); gD.gain.exponentialRampToValueAtTime(0.001, now+0.07);
+          }
+          oD.connect(gD); gD.connect(out); oD.start(); oD.stop(now+0.15);
+        } else {
+          const oH = ctx.createOscillator(), gH = ctx.createGain();
+          oH.type = 'triangle'; oH.frequency.setValueAtTime(10000, now);
+          gH.gain.setValueAtTime(0.06, now); gH.gain.exponentialRampToValueAtTime(0.001, now+0.04);
+          oH.connect(gH); gH.connect(out); oH.start(); oH.stop(now+0.04);
+        }
+      }
+      let delay = 160;
+      if (s.st.event) {
+        if (s.st.event.type === 'lag') delay = 280;
+        else delay = 100;
+      }
+      s.time.delayedCall(delay, () => schedMusic(step+1));
+    };
+    schedMusic(0);
   } catch(_) {}
 }
 function playSound(s, type) {
   try {
-    const ctx = s.sound.context, n = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
+    const ctx = s.sound.context, n = ctx.currentTime;
     const p = (f, d, t='square', f2, v=0.1) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
       o.type = t; o.frequency.setValueAtTime(f, n); if(f2) o.frequency.exponentialRampToValueAtTime(f2, n+d);
       g.gain.setValueAtTime(v, n); g.gain.exponentialRampToValueAtTime(0.001, n+d); o.start(n); o.stop(n+d);
     };
     if (type === 'click') p(1100, 0.05, 'square', 0, 0.06);
     else if (type === 'select') p(660, 0.1, 'square', 1320);
     else if (type === 'pickup') p(440, 0.07, 'triangle', 880);
-    else if (type === 'deploy') { p(523, 0.18); o.frequency.setValueAtTime(784, n+0.1); }
+    else if (type === 'deploy') {
+      p(523, 0.10, 'square');
+      s.time.delayedCall(100, () => p(784, 0.10, 'square'));
+    }
     else if (type === 'hit') p(220, 0.2, 'sawtooth', 55, 0.15);
     else if (type === 'hotfix') p(160, 0.1, 'sawtooth', 800);
     else if (type === 'revert') p(880, 0.1, 'triangle', 220);
+    else if (type === 'sismo') {
+      p(110, 1.2, 'sawtooth', 40, 0.45);
+      const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+      o2.connect(g2); g2.connect(ctx.destination); o2.type = 'sawtooth';
+      o2.frequency.setValueAtTime(440, n); o2.frequency.linearRampToValueAtTime(880, n+0.4); o2.frequency.linearRampToValueAtTime(440, n+0.8);
+      g2.gain.setValueAtTime(0.12, n); g2.gain.linearRampToValueAtTime(0.001, n+0.9);
+      o2.start(n); o2.stop(n+0.9);
+    }
+    else if (type === 'blackout') {
+      p(600, 1.0, 'sawtooth', 30, 0.35);
+    }
+    else if (type === 'lag') {
+      p(400, 0.15, 'square', 100, 0.15);
+      s.time.delayedCall(150, () => playSound(s, 'click'));
+      s.time.delayedCall(300, () => playSound(s, 'click'));
+    }
+    else if (type === 'gameover') {
+      p(392, 0.18, 'sawtooth', 196, 0.22);
+      s.time.delayedCall(160, () => p(311, 0.18, 'sawtooth', 155, 0.22));
+      s.time.delayedCall(320, () => p(261, 0.35, 'sawtooth', 65, 0.25));
+    }
+    else if (type === 'laugh') {
+      p(660, 0.06, 'square', 0, 0.18);
+      s.time.delayedCall(100, () => p(660, 0.06, 'square', 0, 0.18));
+      s.time.delayedCall(200, () => p(660, 0.06, 'square', 0, 0.18));
+      s.time.delayedCall(300, () => p(880, 0.2, 'square', 440, 0.18));
+    }
   } catch(_) {}
 }
 function getStorage() {
